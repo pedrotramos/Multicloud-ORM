@@ -1,6 +1,7 @@
 import boto3
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from termcolor import colored
 
 load_dotenv(verbose=True)
 
@@ -13,24 +14,30 @@ ec2 = session.resource("ec2", region_name="us-east-1")
 
 myInstances = ec2.instances.filter(
     Filters=[
-        # {
-        #     "Name": "tag:owner",
-        #     "Values": ["Pedro Ramos"],
-        # },
+        {
+            "Name": "tag:Owner",
+            "Values": ["Pedro Ramos"],
+        },
         {
             "Name": "instance-state-name",
-            "Values": ["Running"],
+            "Values": ["running", "pending"],
         },
     ]
 )
 
-instanceList = [instance for instance in myInstances]
+idsToTerminate = [instance.id for instance in myInstances]
 
 try:
-    print(instanceList)
-    myInstances.terminate()
-    print("Number of instances terminated: {0}".format(len(instanceList)))
-    for i in range(len(instanceList)):
-        print("{0}) id = {1}".format(i + 1, instancesToTerminate[i]))
+    for instance_id in idsToTerminate:
+        ec2.Instance(instance_id).terminate()
+    print("\n")
+    if len(idsToTerminate) > 0:
+        print(colored("Successfully terminated instances!", "green"))
+        print("Number of instances terminated: {0}".format(len(idsToTerminate)))
+        for i in range(len(idsToTerminate)):
+            print("{0}) id = {1}".format(i + 1, idsToTerminate[i]))
+    else:
+        print(colored("No instances to terminate right now", "yellow"))
 except:
-    print("Couldn't terminate instances.")
+    print("\n")
+    print(colored("Couldn't terminate instances", "red"))
