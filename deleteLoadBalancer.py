@@ -14,10 +14,28 @@ def shutDownLoadBalancer():
 
     clientLB = session.client("elb", region_name="us-east-1")
 
-    try:
-        clientLB.delete_load_balancer(LoadBalancerName="AppLoadBalancer")
-        print(colored("Successfully deleted Load Balancer. Continuing...\n", "green"))
-    except Exception as e:
-        print("\n")
-        print(e)
-        print(colored("Couldn't delete Load Balancer. Try again!", "red"))
+    client = session.client("ec2", region_name="us-east-1")
+
+    lbs = clientLB.describe_load_balancers()
+
+    delete = False
+
+    print("Checking whether there is a Load Balancer to delete...")
+    for lb in lbs["LoadBalancerDescriptions"]:
+        if lb["LoadBalancerName"] == "AppLoadBalancer":
+            delete = True
+
+    if delete:
+        print("Deleting Load Balancers...")
+        try:
+            clientLB.delete_load_balancer(LoadBalancerName="AppLoadBalancer")
+            print(colored("Successfully deleted Load Balancer.", "green"))
+        except Exception as e:
+            print("\n")
+            print(e)
+            print(colored("Couldn't delete Load Balancer. Try again!", "red"))
+
+        print(colored("Load Balancer deletion complete. Continuing...\n", "green"))
+
+    else:
+        print(colored("No Load Balancers to delete. Continuing...\n", "green"))

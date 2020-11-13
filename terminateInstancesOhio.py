@@ -48,7 +48,7 @@ def terminateOhio():
                 print("{0}) id = {1}".format(i + 1, idsToTerminate[i]))
             try:
                 client.delete_security_group(GroupName="Database-SG")
-                print(colored("Successfully deleted database security group", "green"))
+                print(colored("Successfully deleted database security group.", "green"))
             except:
                 print(colored("Couldn't delete database security group", "red"))
         else:

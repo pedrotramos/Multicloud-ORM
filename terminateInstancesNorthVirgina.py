@@ -46,15 +46,62 @@ def terminateNorthVirginia():
             print("Number of instances terminated: {0}".format(len(idsToTerminate)))
             for i in range(len(idsToTerminate)):
                 print("{0}) id = {1}".format(i + 1, idsToTerminate[i]))
+
+            enis = client.describe_network_interfaces(
+                Filters=[
+                    {
+                        "Name": "group-name",
+                        "Values": [
+                            "Application-SG",
+                        ],
+                    },
+                ],
+            )
+
+            enis_ids = [eni["NetworkInterfaceId"] for eni in enis["NetworkInterfaces"]]
+
+            for eni_id in enis_ids:
+                client.delete_network_interface(NetworkInterfaceId=eni_id)
+
             try:
                 client.delete_security_group(GroupName="Application-SG")
                 print(
-                    colored("Successfully deleted application security group", "green")
+                    colored("Successfully deleted application security group.", "green")
                 )
             except:
-                print(colored("Couldn't delete application security group", "red"))
+                print(colored("Couldn't delete application security group.", "red"))
         else:
+            enis = client.describe_network_interfaces(
+                Filters=[
+                    {
+                        "Name": "group-name",
+                        "Values": [
+                            "Application-SG",
+                        ],
+                    },
+                ],
+            )
+
+            enis_ids = [eni["NetworkInterfaceId"] for eni in enis["NetworkInterfaces"]]
+
+            for eni_id in enis_ids:
+                client.delete_network_interface(NetworkInterfaceId=eni_id)
+
             print(colored("No instances to terminate right now.", "yellow"))
+
+            deleteSG = False
+            security_groups = client.describe_security_groups()
+            for security_group in security_groups["SecurityGroups"]:
+                if security_group["GroupName"] == "Application-SG":
+                    deleteSG = True
+                    sg_id = security_group["GroupId"]
+
+            if deleteSG:
+                client.delete_security_group(GroupId=sg_id)
+                print(
+                    colored("Successfully deleted application security group.", "green")
+                )
+
     except Exception as e:
         print("\n")
         print(e)

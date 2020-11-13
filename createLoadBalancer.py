@@ -18,77 +18,91 @@ def launchLoadBalancer():
 
     ec2 = session.resource("ec2", region_name="us-east-1")
 
-    try:
-        security_groups = client.describe_security_groups(
-            GroupNames=[
-                "Application-SG",
-            ],
-        )
+    create = True
 
-        myInstances = ec2.instances.filter(
-            Filters=[
-                {
-                    "Name": "tag:Owner",
-                    "Values": ["Pedro Ramos"],
-                },
-                {
-                    "Name": "tag:Application",
-                    "Values": ["Application"],
-                },
-                {
-                    "Name": "instance-state-name",
-                    "Values": ["running", "pending"],
-                },
-            ]
-        )
+    lbs = clientLB.describe_load_balancers()
 
-        subnets = []
-        instance_ids = []
-        for instance in myInstances:
-            if instance.subnet.id not in subnets:
-                subnets.append(instance.subnet.id)
-            instance_ids.append(instance.id)
+    print("Checking whether Load Balancer already exists...")
+    for lb in lbs["LoadBalancerDescriptions"]:
+        if lb["LoadBalancerName"] == "AppLoadBalancer":
+            create = False
 
-        loadBalancer = clientLB.create_load_balancer(
-            LoadBalancerName="AppLoadBalancer",
-            Listeners=[
-                {
-                    "Protocol": "tcp",
-                    "LoadBalancerPort": 80,
-                    "InstanceProtocol": "tcp",
-                    "InstancePort": 8080,
-                },
-            ],
-            Subnets=subnets,
-            SecurityGroups=[
-                security_groups["SecurityGroups"][0]["GroupId"],
-            ],
-            Tags=[
-                {"Key": "Name", "Value": "TestAppLB"},
-                {"Key": "Owner", "Value": "Pedro Ramos"},
-                {"Key": "Application", "Value": "Application"},
-            ],
-        )
-
-        print("Successfully created Load Balancer. Continuing...")
-
-        # try:
-        #     for instance_id in instance_ids:
-        #         clientLB.register_instances_with_load_balancer(
-        #             LoadBalancerName="AppLoadBalancer",
-        #             Instances=[
-        #                 {"InstanceId": instance_id},
-        #             ],
-        #         )
-        #     print("Successfully registered instances with Load Balancer. Continuing...")
-        print(
-            colored(
-                "Load Balancer setup complete. Proceeding to Auto Scalling Group setup...\n",
-                "green",
+    if create:
+        print("Creating Load Balancer...")
+        try:
+            myInstances = ec2.instances.filter(
+                Filters=[
+                    {
+                        "Name": "tag:Owner",
+                        "Values": ["Pedro Ramos"],
+                    },
+                    {
+                        "Name": "tag:Application",
+                        "Values": ["Application"],
+                    },
+                    {
+                        "Name": "instance-state-name",
+                        "Values": ["running", "pending"],
+                    },
+                ]
             )
-        )
+
+            subnets = []
+            for instance in myInstances:
+                if instance.subnet.id not in subnets:
+                    subnets.append(instance.subnet.id)
         except:
-            print("Couldn't register all instances with Load Balancer. Try Again!")
-    except Exception as e:
-        print(e)
-        print(colored("Couldn't create Load Balancer. Try Again!", "red"))
+            print(
+                colored("Couldn't get appropriate subnet for the Load Balancer", "red")
+            )
+
+        try:
+            security_groups = client.describe_security_groups(
+                GroupNames=[
+                    "Application-SG",
+                ],
+            )
+
+            loadBalancer = clientLB.create_load_balancer(
+                LoadBalancerName="AppLoadBalancer",
+                Listeners=[
+                    {
+                        "Protocol": "tcp",
+                        "LoadBalancerPort": 80,
+                        "InstanceProtocol": "tcp",
+                        "InstancePort": 8080,
+                    },
+                ],
+                Subnets=subnets,
+                SecurityGroups=[
+                    security_groups["SecurityGroups"][0]["GroupId"],
+                ],
+                Tags=[
+                    {"Key": "Name", "Value": "TestAppLB"},
+                    {"Key": "Owner", "Value": "Pedro Ramos"},
+                    {"Key": "Application", "Value": "Application"},
+                ],
+            )
+
+            print(colored("Successfully created Load Balancer!", "green"))
+
+        except:
+            print(colored("Couldn't create Load Balancer. Try Again!", "red"))
+
+    else:
+        print("Load Balancer already exists. Getting it's DNS Name...")
+
+    lb = clientLB.describe_load_balancers(
+        LoadBalancerNames=[
+            "AppLoadBalancer",
+        ],
+    )
+
+    print("Load Balancer DNS Name: " + lb["LoadBalancerDescriptions"][0]["DNSName"])
+
+    print(
+        colored(
+            "Load Balancer setup complete. Proceeding to Auto Scalling Group setup...\n",
+            "green",
+        )
+    )

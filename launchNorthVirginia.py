@@ -2,6 +2,8 @@ import boto3
 import os
 from dotenv import load_dotenv
 from termcolor import colored
+from deleteAutoScalingGroup import shutDownASG
+from deleteLoadBalancer import shutDownLoadBalancer
 from terminateInstancesNorthVirgina import terminateNorthVirginia
 
 
@@ -16,6 +18,8 @@ def launchNorthVirginiaInstances(ipOhio):
     client = session.client("ec2", region_name="us-east-1")
 
     ec2 = session.resource("ec2", region_name="us-east-1")
+
+    clientASG = session.client("autoscaling", region_name="us-east-1")
 
     key_name = "Pedro-NV-ProjetoCloud"
 
@@ -47,10 +51,19 @@ def launchNorthVirginiaInstances(ipOhio):
 
     myInstanceList = [instance for instance in myInstances]
 
-    if len(myInstanceList) > 0:
-        print("Instances already running.")
-        resp = input("Terminate and recreate instances? [Y/N] ")
+    asgRunning = False
+
+    asgs = clientASG.describe_auto_scaling_groups()
+    for asg in asgs["AutoScalingGroups"]:
+        if asg["AutoScalingGroupName"] == "AppASG":
+            asgRunning = True
+
+    if len(myInstanceList) > 0 or asgRunning:
+        print("Application already configured.")
+        resp = input("Terminate and rebuild Application? [Y/N] ")
         if resp == "Y" or resp == "y":
+            shutDownASG()
+            shutDownLoadBalancer()
             terminateNorthVirginia()
             try:
                 security_group = client.create_security_group(
@@ -70,6 +83,12 @@ def launchNorthVirginiaInstances(ipOhio):
                             "IpProtocol": "tcp",
                             "FromPort": 8080,
                             "ToPort": 8080,
+                            "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                        },
+                        {
+                            "IpProtocol": "tcp",
+                            "FromPort": 80,
+                            "ToPort": 80,
                             "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
                         },
                     ],
@@ -92,7 +111,7 @@ def launchNorthVirginiaInstances(ipOhio):
                     ImageId="ami-0dba2cb6798deb6d8",
                     KeyName=key_name,
                     MinCount=1,
-                    MaxCount=2,
+                    MaxCount=1,
                     InstanceType="t2.micro",
                     SecurityGroups=["Application-SG"],
                     UserData="""#!/bin/sh
@@ -108,28 +127,22 @@ sudo reboot
                     ),
                 )
 
-                print(colored("Successfully created instances!", "green"))
-                print(
-                    "Number of instances created in North Virginia: {0}".format(
-                        len(ec2_instances)
-                    )
-                )
                 for i in range(len(ec2_instances)):
                     # use the boto3 waiter
                     ec2_instances[i].wait_until_running()
                     # reload the instance object
                     ec2_instances[i].reload()
-                    public_ip = ec2_instances[i].public_ip_address
-                    print("{0}) Public IPv4 Address: {1}".format(i + 1, public_ip))
+                print(colored("Successfully created template instance!", "green"))
 
             except:
                 print(
                     colored(
-                        "Failed to create North Virginia instances. Try again!\n", "red"
+                        "Failed to create North Virginia template instance. Try again!\n",
+                        "red",
                     )
                 )
         else:
-            print("Running instances unchanged. Continuing...")
+            print("North Virgina instances unchanged. Continuing...")
         print(
             colored(
                 "North Virginia setup complete. Proceeding to Load Balancer setup...\n",
@@ -157,6 +170,12 @@ sudo reboot
                         "ToPort": 8080,
                         "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
                     },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 80,
+                        "ToPort": 80,
+                        "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                    },
                 ],
             )
             print("Application security group successfully created. Continuing...")
@@ -177,7 +196,7 @@ sudo reboot
                 ImageId="ami-0dba2cb6798deb6d8",
                 KeyName=key_name,
                 MinCount=1,
-                MaxCount=2,
+                MaxCount=1,
                 InstanceType="t2.micro",
                 SecurityGroups=["Application-SG"],
                 UserData="""#!/bin/sh
@@ -193,19 +212,12 @@ sudo reboot
                 ),
             )
 
-            print(colored("Successfully created instances!", "green"))
-            print(
-                "Number of instances created in North Virginia: {0}".format(
-                    len(ec2_instances)
-                )
-            )
             for i in range(len(ec2_instances)):
                 # use the boto3 waiter
                 ec2_instances[i].wait_until_running()
                 # reload the instance object
                 ec2_instances[i].reload()
-                public_ip = ec2_instances[i].public_ip_address
-                print("{0}) Public IPv4 Address: {1}".format(i + 1, public_ip))
+            print(colored("Successfully created template instance!", "green"))
             print(
                 colored(
                     "North Virginia setup complete. Proceeding to Load Balancer setup...\n",
@@ -216,6 +228,7 @@ sudo reboot
             print(e)
             print(
                 colored(
-                    "Failed to create North Virginia instances. Try again!\n", "red"
+                    "Failed to create North Virginia template instance. Try again!\n",
+                    "red",
                 )
             )
