@@ -117,7 +117,7 @@ def launchNorthVirginiaInstances(ipOhio):
                     UserData="""#!/bin/sh
 sudo apt update
 cd /home/ubuntu
-git clone https://github.com/raulikeda/tasks.git
+git clone https://github.com/pedrotramos/tasks.git
 sudo sed -i "83 c \\\t'HOST': '{0}'," tasks/portfolio/settings.py
 cd tasks
 ./install.sh
@@ -202,7 +202,7 @@ sudo reboot
                 UserData="""#!/bin/sh
 sudo apt update
 cd /home/ubuntu
-git clone https://github.com/raulikeda/tasks.git
+git clone https://github.com/pedrotramos/tasks.git
 sudo sed -i "83 c \\\t'HOST': '{0}'," tasks/portfolio/settings.py
 cd tasks
 ./install.sh

@@ -100,6 +100,22 @@ def launchLoadBalancer():
 
     print("Load Balancer DNS Name: " + lb["LoadBalancerDescriptions"][0]["DNSName"])
 
+    with open("ManageDB.py", "r") as f:
+        lines = f.readlines()
+
+    linesToWrite = []
+    for line in lines:
+        if line[:6] == "appURL":
+            line = 'appURL = "http://{0}/tasks"\n'.format(
+                lb["LoadBalancerDescriptions"][0]["DNSName"].lower()
+            )
+            linesToWrite.append(line)
+        else:
+            linesToWrite.append(line)
+
+    with open("ManageDB.py", "w") as f:
+        f.writelines(linesToWrite)
+
     print(
         colored(
             "Load Balancer setup complete. Proceeding to Auto Scalling Group setup...\n",
