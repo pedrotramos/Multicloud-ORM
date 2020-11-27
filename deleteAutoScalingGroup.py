@@ -20,14 +20,14 @@ def shutDownASG():
 
     print("Checking whether there is an Auto Scaling Group to delete...")
     for asg in asgs["AutoScalingGroups"]:
-        if asg["AutoScalingGroupName"] == "AppASG":
+        if asg["AutoScalingGroupName"] == "DjangoApp":
             delete = True
 
     if delete:
         print("Deleting Auto Scaling Group...")
         try:
             clientASG.delete_auto_scaling_group(
-                AutoScalingGroupName="AppASG", ForceDelete=True
+                AutoScalingGroupName="DjangoApp", ForceDelete=True
             )
             print(colored("Successfully deleted Auto Scaling Group.", "green"))
         except Exception as e:
@@ -44,13 +44,13 @@ def shutDownASG():
 
     print("Checking whether there is a Launch Configuration to delete...")
     for lc in lcs["LaunchConfigurations"]:
-        if lc["LaunchConfigurationName"] == "AppASG":
+        if lc["LaunchConfigurationName"] == "DjangoApp":
             delete = True
 
     if delete:
         print("Deleting Launch Configuration...")
         try:
-            clientASG.delete_launch_configuration(LaunchConfigurationName="AppASG")
+            clientASG.delete_launch_configuration(LaunchConfigurationName="DjangoApp")
             print(colored("Successfully deleted Launch Configuration.", "green"))
         except Exception as e:
             print(e)
@@ -60,4 +60,4 @@ def shutDownASG():
             colored("Launch Configuration deletion complete. Continuing...\n", "green")
         )
     else:
-        print(colored("No Auto Scaling Groups to delete. Continuing...\n", "green"))
+        print(colored("No Launch Configuration to delete. Continuing...\n", "green"))

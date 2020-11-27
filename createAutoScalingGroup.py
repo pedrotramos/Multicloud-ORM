@@ -32,7 +32,7 @@ def launchASG():
         Filters=[
             {
                 "Name": "tag:Name",
-                "Values": ["TestApp"],
+                "Values": ["TemplateInstance"],
             },
             {
                 "Name": "tag:Owner",
@@ -61,7 +61,7 @@ def launchASG():
                 InstanceId=instance_ids[0],
                 LoadBalancerNames=["AppLoadBalancer"],
                 Tags=[
-                    {"Key": "Name", "Value": "TestAppASG"},
+                    {"Key": "Name", "Value": "DjangoApp"},
                     {"Key": "Owner", "Value": "Pedro Ramos"},
                     {"Key": "Application", "Value": "Application"},
                 ],

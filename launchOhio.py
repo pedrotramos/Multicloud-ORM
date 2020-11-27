@@ -83,7 +83,7 @@ def launchOhioInstances():
                         {
                             "ResourceType": "instance",
                             "Tags": [
-                                {"Key": "Name", "Value": "TestDB"},
+                                {"Key": "Name", "Value": "DB-Instance"},
                                 {"Key": "Owner", "Value": "Pedro Ramos"},
                                 {"Key": "Application", "Value": "Database Server"},
                             ],
@@ -164,7 +164,7 @@ sudo systemctl restart postgresql
                     {
                         "ResourceType": "instance",
                         "Tags": [
-                            {"Key": "Name", "Value": "TestDB"},
+                            {"Key": "Name", "Value": "DB-Instance"},
                             {"Key": "Owner", "Value": "Pedro Ramos"},
                             {"Key": "Application", "Value": "Database Server"},
                         ],

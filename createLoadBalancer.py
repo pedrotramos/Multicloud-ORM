@@ -100,7 +100,7 @@ def launchLoadBalancer():
 
     print("Load Balancer DNS Name: " + lb["LoadBalancerDescriptions"][0]["DNSName"])
 
-    with open("ManageDB.py", "r") as f:
+    with open("CLI.py", "r") as f:
         lines = f.readlines()
 
     linesToWrite = []
@@ -113,7 +113,7 @@ def launchLoadBalancer():
         else:
             linesToWrite.append(line)
 
-    with open("ManageDB.py", "w") as f:
+    with open("CLI.py", "w") as f:
         f.writelines(linesToWrite)
 
     print(

@@ -102,7 +102,7 @@ def launchNorthVirginiaInstances(ipOhio):
                         {
                             "ResourceType": "instance",
                             "Tags": [
-                                {"Key": "Name", "Value": "TestApp"},
+                                {"Key": "Name", "Value": "TemplateInstance"},
                                 {"Key": "Owner", "Value": "Pedro Ramos"},
                                 {"Key": "Application", "Value": "Application"},
                             ],
@@ -187,7 +187,7 @@ sudo reboot
                     {
                         "ResourceType": "instance",
                         "Tags": [
-                            {"Key": "Name", "Value": "TestApp"},
+                            {"Key": "Name", "Value": "TemplateInstance"},
                             {"Key": "Owner", "Value": "Pedro Ramos"},
                             {"Key": "Application", "Value": "Application"},
                         ],
