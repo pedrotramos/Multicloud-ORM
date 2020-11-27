@@ -34,7 +34,7 @@ while run:
         print(json.dumps(r.json(), sort_keys=False, indent=4))
         print("\n")
     elif action == 3:
-        taskTitle = input("Taks title: ")
+        taskTitle = input("Task title: ")
         taskDescription = input("Task description: ")
         r = requests.post(
             url=appURL + "/add",
@@ -50,7 +50,7 @@ while run:
             print(colored("\nSomething went wrong! Try Again.\n", "red"))
     elif action == 4:
         task_id = input("ID of task to alter: ")
-        taskTitle = input("Taks title: ")
+        taskTitle = input("Task title: ")
         taskDescription = input("Task description: ")
         r = requests.put(
             url=appURL + "/alter/{0}".format(task_id),
