@@ -25,7 +25,7 @@ def launchASG():
 
     print("Checking whether Auto Scaling Group already exists...")
     for asg in asgs["AutoScalingGroups"]:
-        if asg["AutoScalingGroupName"] == "AppASG":
+        if asg["AutoScalingGroupName"] == "DjangoApp":
             create = False
 
     myInstances = ec2.instances.filter(
@@ -57,7 +57,7 @@ def launchASG():
         print("Creating Auto Scaling Group...")
         try:
             clientASG.create_auto_scaling_group(
-                AutoScalingGroupName="AppASG",
+                AutoScalingGroupName="DjangoApp",
                 InstanceId=instance_ids[0],
                 LoadBalancerNames=["AppLoadBalancer"],
                 Tags=[

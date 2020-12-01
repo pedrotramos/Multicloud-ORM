@@ -3,7 +3,7 @@ import json
 import requests
 import datetime
 
-appURL = "http://apploadbalancer-1287131272.us-east-1.elb.amazonaws.com/tasks"
+appURL = "http://apploadbalancer-325336564.us-east-1.elb.amazonaws.com/tasks"
 
 run = True
 

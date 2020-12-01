@@ -55,7 +55,7 @@ def launchNorthVirginiaInstances(ipOhio):
 
     asgs = clientASG.describe_auto_scaling_groups()
     for asg in asgs["AutoScalingGroups"]:
-        if asg["AutoScalingGroupName"] == "AppASG":
+        if asg["AutoScalingGroupName"] == "DjangoApp":
             asgRunning = True
 
     if len(myInstanceList) > 0 or asgRunning:

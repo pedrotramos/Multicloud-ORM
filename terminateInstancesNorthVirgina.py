@@ -61,7 +61,10 @@ def terminateNorthVirginia():
             enis_ids = [eni["NetworkInterfaceId"] for eni in enis["NetworkInterfaces"]]
 
             for eni_id in enis_ids:
-                client.delete_network_interface(NetworkInterfaceId=eni_id)
+                try:
+                    client.delete_network_interface(NetworkInterfaceId=eni_id)
+                except:
+                    pass
 
             try:
                 client.delete_security_group(GroupName="Application-SG")
@@ -85,7 +88,10 @@ def terminateNorthVirginia():
             enis_ids = [eni["NetworkInterfaceId"] for eni in enis["NetworkInterfaces"]]
 
             for eni_id in enis_ids:
-                client.delete_network_interface(NetworkInterfaceId=eni_id)
+                try:
+                    client.delete_network_interface(NetworkInterfaceId=eni_id)
+                except:
+                    pass
 
             print(colored("No instances to terminate right now.", "yellow"))
 
