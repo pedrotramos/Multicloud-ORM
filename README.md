@@ -2,9 +2,7 @@
 
 This project uses boto3, Django and Postgres to programatically build a multicloud ORM system that works with Load Balancer and Autoscaling. After the build is complete the system should have the following architecture:
 
-<div style="text-align: center; margin: 35px 0;">
-    <img src="assets/SystemArchitecture.png" width=400/>
-</div>
+<img src="assets/SystemArchitecture.png"/>
 
 With the ORM served with an Autoscaling Group and a Load Balancer the system ends up getting more resilience and scalability. Therefore, it is able to deal with a surge of requests as the Load Balancer makes sure that those requests are not overwhelming a single instance and the Autoscaling Group increases and decreases the number of instances according to demand. The system's flexibility to grow or shrink as needed helps to maximize availability, while minimizing resource idleness. 
 
