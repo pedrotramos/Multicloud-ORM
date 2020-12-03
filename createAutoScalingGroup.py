@@ -66,7 +66,7 @@ def launchASG():
                     {"Key": "Application", "Value": "Application"},
                 ],
                 MinSize=1,
-                MaxSize=2,
+                MaxSize=4,
                 DesiredCapacity=1,
             )
             print("Successfully created Auto Scaling Group. Continuing...")

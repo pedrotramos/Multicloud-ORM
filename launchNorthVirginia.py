@@ -97,6 +97,7 @@ def launchNorthVirginiaInstances(ipOhio):
             except:
                 print("Application security group already exists. Continuing...")
             try:
+                print("Creating North Virginia template instance...")
                 ec2_instances = ec2.create_instances(
                     TagSpecifications=[
                         {
@@ -182,6 +183,7 @@ sudo reboot
         except:
             print("Application security group already exists. Continuing...")
         try:
+            print("Creating North Virginia template instance...")
             ec2_instances = ec2.create_instances(
                 TagSpecifications=[
                     {

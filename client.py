@@ -29,7 +29,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-appURL = "http://apploadbalancer-1741765773.us-east-1.elb.amazonaws.com/tasks"
+appURL = "http://apploadbalancer-718275496.us-east-1.elb.amazonaws.com/tasks"
 
 if args.verb == "GET" and args.id is None:
     r = requests.get(url=appURL + "/")
@@ -54,6 +54,8 @@ elif args.verb == "POST":
         print(colored("\nSuccessfully added task!\n", "green"))
     else:
         print(colored("\nSomething went wrong! Try Again.\n", "red"))
+        print(args.title, args.desc)
+        print(r.status_code)
 elif args.verb == "PUT":
     r = requests.put(
         url=appURL + "/{0}".format(args.id),
@@ -67,11 +69,13 @@ elif args.verb == "PUT":
         print(colored("\nSuccessfully altered task!\n", "green"))
     else:
         print(colored("\nSomething went wrong! Try Again.\n", "red"))
+        print(r.status_code)
 elif args.verb == "DELETE":
     r = requests.delete(url=appURL + "/{0}".format(args.id))
     if r.status_code == 200:
         print(colored("\nSuccessfully removed task!\n", "green"))
     else:
         print(colored("\nSomething went wrong! Try Again.\n", "red"))
+        print(r.status_code)
 else:
     print(colored("\nBad Request! Try again.\n", "red"))
